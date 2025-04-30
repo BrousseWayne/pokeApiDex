@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -120,7 +127,9 @@
 }
 
 .app-layout {
+  flex: 1;
   display: flex;
+  /* flex-direction: column; */
   min-height: 100vh;
 }
 
@@ -131,9 +140,8 @@
 }
 
 .app-header {
-  height: 60px; /* optional */
+  height: 60px;
   padding: 1rem;
-  /* border-bottom: 1px solid #ccc; */
 }
 
 .app-main {

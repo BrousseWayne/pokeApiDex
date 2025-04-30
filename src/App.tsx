@@ -4,67 +4,12 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
 } from "./components/ui/sidebar";
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 import { Button } from "./components/ui/button";
 
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-];
-
-type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
-
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./components/ui/table";
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -74,6 +19,61 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "./components/ui/breadcrumb";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "./components/ui/input";
+import { useState } from "react";
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { json } from "stream/consumers";
+import { TypeButton } from "./components/ui/typeButton";
+
+type PokemonData = {
+  name: string;
+  types: string;
+  sprite: string;
+};
+
+function capitalizeFirstLetter(val: string) {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
+
+export function TableDemo({ tableData }) {
+  return (
+    <Table>
+      <TableBody>
+        {tableData.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={4}>No data found</TableCell>
+          </TableRow>
+        ) : (
+          tableData.map((pokemon) => (
+            <TableRow key={pokemon.name}>
+              <TableCell className="font-medium">
+                {capitalizeFirstLetter(pokemon.name)}
+              </TableCell>
+              <TypeButton type={pokemon.types} />
+            </TableRow>
+          ))
+        )}
+      </TableBody>
+    </Table>
+  );
+}
 
 export function AppSidebar() {
   return (
@@ -87,13 +87,6 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export function Breadcrumbs() {
   return (
@@ -129,119 +122,58 @@ export function Breadcrumbs() {
   );
 }
 
-export const payments: Payment[] = [
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  // ...
-];
+function MyForm({ setTableData }) {
+  const [inputValue, setInputValue] = useState("");
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
+  async function handleSubmit(e) {
+    e.preventDefault();
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
+    const reponse = await fetch(
+      `http://localhost:3000/search?type=${inputValue}`
+    );
+    const jsonData = await reponse.json();
+    console.log(jsonData);
+    const ret = [];
+    for (const pkmn of jsonData) {
+      ret.push({
+        name: pkmn.name,
+        types: pkmn.types[0].type.name,
+        sprite: pkmn.sprites.front_default,
+      });
+    }
+
+    setTableData(ret);
+  }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <form method="post" onSubmit={handleSubmit}>
+      <Input
+        type="text"
+        placeholder="Enter a type or a pokemon"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+      />
+      <Button type="submit">Query</Button>
+    </form>
   );
 }
 
-// This type is used to define the shape of our data.
-
-export const columns: ColumnDef<Payment>[] = [
-  {
-    accessorKey: "status",
-    header: "Status",
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "amount",
-    header: "Amount",
-  },
-];
-
 function App() {
+  const [tableData, setTableData] = useState([]);
+
   return (
     <>
-      <div>
-        <h1>TESTETSTSTSTSTSTS</h1>
-      </div>
       <SidebarProvider>
         <div className="app-layout">
           <AppSidebar />
-
-          <header className="app-header">
-            {/* <SidebarTrigger /> */}
-            {/* <Breadcrumbs /> */}
-          </header>
+          <div className="app-header">
+            <SidebarTrigger />
+            <Breadcrumbs />
+          </div>
 
           <main className="app-content">
-            <div>{/* <DataTable columns={columns} data={payments} /> */}</div>
+            <MyForm setTableData={setTableData} />
+            <div>{<TableDemo tableData={tableData} />}</div>
           </main>
         </div>
       </SidebarProvider>

@@ -12,7 +12,6 @@ import { Button } from "./components/ui/button";
 
 import {
   Breadcrumb,
-  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
@@ -20,27 +19,41 @@ import {
   BreadcrumbSeparator,
 } from "./components/ui/breadcrumb";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "./components/ui/input";
 import { useState } from "react";
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { json } from "stream/consumers";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { TypeButton } from "./components/ui/typeButton";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+export function DropdownMenuRadioGroupPoke({ query, onValueChange }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Search by</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuRadioGroup value={query} onValueChange={onValueChange}>
+          <DropdownMenuRadioItem value="type">Type</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="name">Name</DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function capitalizeFirstLetter(val: string) {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
 
 type PokemonData = {
   name: string;
@@ -48,25 +61,41 @@ type PokemonData = {
   sprite: string;
 };
 
-function capitalizeFirstLetter(val: string) {
-  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+function TableElement({ pokemon }) {
+  return (
+    <>
+      <TableCell className="font-medium">
+        <img
+          src={pokemon.sprite}
+          alt={pokemon.name}
+          className="w-15 h-15 object-contain"
+        />
+        {capitalizeFirstLetter(pokemon.name)}
+      </TableCell>
+      <TableCell>
+        <div className="flex gap-2">
+          {pokemon.types.map((type) => (
+            <TypeButton key={type.type.name} type={type.type.name} />
+          ))}
+        </div>
+      </TableCell>
+    </>
+  );
 }
-
-export function TableDemo({ tableData }) {
+function TableDemo({ tableData }) {
   return (
     <Table>
       <TableBody>
-        {tableData.length === 0 ? (
+        {!Array.isArray(tableData) ? (
           <TableRow>
-            <TableCell colSpan={4}>No data found</TableCell>
+            <TableCell>
+              <TableElement pokemon={tableData} />
+            </TableCell>
           </TableRow>
         ) : (
           tableData.map((pokemon) => (
             <TableRow key={pokemon.name}>
-              <TableCell className="font-medium">
-                {capitalizeFirstLetter(pokemon.name)}
-              </TableCell>
-              <TypeButton type={pokemon.types} />
+              <TableElement pokemon={pokemon} />
             </TableRow>
           ))
         )}
@@ -75,7 +104,7 @@ export function TableDemo({ tableData }) {
   );
 }
 
-export function AppSidebar() {
+function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader />
@@ -88,26 +117,12 @@ export function AppSidebar() {
   );
 }
 
-export function Breadcrumbs() {
+function Breadcrumbs() {
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink href="/">Home</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1">
-              <BreadcrumbEllipsis className="h-4 w-4" />
-              <span className="sr-only">Toggle menu</span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuItem>Documentation</DropdownMenuItem>
-              <DropdownMenuItem>Themes</DropdownMenuItem>
-              <DropdownMenuItem>GitHub</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
@@ -124,29 +139,39 @@ export function Breadcrumbs() {
 
 function MyForm({ setTableData }) {
   const [inputValue, setInputValue] = useState("");
+  const [query, setQuery] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     const reponse = await fetch(
-      `http://localhost:3000/search?type=${inputValue}`
+      `http://localhost:3000/search?${query}=${inputValue.toLowerCase()}`
     );
     const jsonData = await reponse.json();
     console.log(jsonData);
-    const ret = [];
-    for (const pkmn of jsonData) {
-      ret.push({
-        name: pkmn.name,
-        types: pkmn.types[0].type.name,
-        sprite: pkmn.sprites.front_default,
+    if (Array.isArray(jsonData)) {
+      const ret = [];
+      for (const pkmn of jsonData) {
+        ret.push({
+          name: pkmn.name,
+          types: pkmn.types,
+          sprite: pkmn.sprites.front_default,
+        });
+      }
+
+      setTableData(ret);
+    } else {
+      setTableData({
+        name: jsonData.name,
+        types: jsonData.types,
+        sprite: jsonData.sprites.front_default,
       });
     }
-
-    setTableData(ret);
   }
 
   return (
     <form method="post" onSubmit={handleSubmit}>
+      <DropdownMenuRadioGroupPoke query={query} onValueChange={setQuery} />
       <Input
         type="text"
         placeholder="Enter a type or a pokemon"
@@ -162,22 +187,24 @@ function App() {
   const [tableData, setTableData] = useState([]);
 
   return (
-    <>
-      <SidebarProvider>
-        <div className="app-layout">
-          <AppSidebar />
+    <SidebarProvider>
+      <div className="app-layout">
+        <AppSidebar />
+        <div className="content-area">
           <div className="app-header">
             <SidebarTrigger />
             <Breadcrumbs />
           </div>
 
           <main className="app-content">
-            <MyForm setTableData={setTableData} />
+            <div className="center-box">
+              <MyForm setTableData={setTableData} />
+            </div>
             <div>{<TableDemo tableData={tableData} />}</div>
           </main>
         </div>
-      </SidebarProvider>
-    </>
+      </div>
+    </SidebarProvider>
   );
 }
 

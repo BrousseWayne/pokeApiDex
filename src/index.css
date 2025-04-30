@@ -127,24 +127,85 @@ body,
 }
 
 .app-layout {
-  flex: 1;
   display: flex;
-  /* flex-direction: column; */
   min-height: 100vh;
+  width: 100%;
 }
 
+/* Sidebar */
+.app-sidebar {
+  width: 250px;
+  background-color: #1a1a1a;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.content-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  color: #ddd;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+/* Content area takes remaining space */
 .app-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Center content vertically */
+  padding: 2rem;
+  gap: 2rem;
+  overflow-y: auto;
 }
 
-.app-header {
-  height: 60px;
-  padding: 1rem;
+/* Center square */
+.center-box {
+  width: 500px;
+  height: 300px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background-color: #111;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
-.app-main {
-  flex: 1;
-  padding: 1rem;
+/* Form inside square */
+.center-box form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Input style */
+.center-box input {
+  padding: 0.5rem;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background-color: #222;
+  color: #fff;
+}
+
+/* Button style */
+.center-box button {
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.center-box button:hover {
+  background-color: #2563eb;
 }

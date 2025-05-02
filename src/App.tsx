@@ -209,3 +209,5 @@ function App() {
 }
 
 export default App;
+
+// TODO: add a default paramater for the search

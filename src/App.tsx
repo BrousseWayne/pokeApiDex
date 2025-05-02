@@ -1,4 +1,10 @@
 import "./index.css";
+import { Input } from "./components/ui/input";
+import { useState } from "react";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { TypeButton } from "./components/ui/typeButton";
+import { Button } from "./components/ui/button";
+
 import {
   Sidebar,
   SidebarContent,
@@ -8,8 +14,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "./components/ui/sidebar";
-import { Button } from "./components/ui/button";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,19 +23,11 @@ import {
   BreadcrumbSeparator,
 } from "./components/ui/breadcrumb";
 
-import { Input } from "./components/ui/input";
-import { useState } from "react";
-
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { TypeButton } from "./components/ui/typeButton";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -55,16 +51,37 @@ function capitalizeFirstLetter(val: string) {
   return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }
 
+function StatsArray({ stats }) {
+  return (
+    <div className="pokemon-stats">
+      <div className="stat-row">
+        <span>HP</span>
+        <span>Atk</span>
+        <span>Def</span>
+        <span>SpA</span>
+        <span>SpD</span>
+        <span>Spe</span>
+      </div>
+      <div className="value-row">
+        {stats.map((stat) => (
+          <span key={stat.stat.name}>{stat.base_stat}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 type PokemonData = {
   name: string;
   types: string;
   sprite: string;
+  // stats:
 };
 
 function TableElement({ pokemon }) {
   return (
     <>
-      <TableCell className="font-medium">
+      <TableCell className="font-medium test2">
         <img
           src={pokemon.sprite}
           alt={pokemon.name}
@@ -73,11 +90,14 @@ function TableElement({ pokemon }) {
         {capitalizeFirstLetter(pokemon.name)}
       </TableCell>
       <TableCell>
-        <div className="flex gap-2">
+        <div className="flex">
           {pokemon.types.map((type) => (
             <TypeButton key={type.type.name} type={type.type.name} />
           ))}
         </div>
+      </TableCell>
+      <TableCell>
+        <StatsArray stats={pokemon.stats} />
       </TableCell>
     </>
   );
@@ -87,10 +107,8 @@ function TableDemo({ tableData }) {
     <Table>
       <TableBody>
         {!Array.isArray(tableData) ? (
-          <TableRow>
-            <TableCell>
-              <TableElement pokemon={tableData} />
-            </TableCell>
+          <TableRow className="test">
+            <TableElement pokemon={tableData} />
           </TableRow>
         ) : (
           tableData.map((pokemon) => (
@@ -156,6 +174,7 @@ function MyForm({ setTableData }) {
           name: pkmn.name,
           types: pkmn.types,
           sprite: pkmn.sprites.front_default,
+          stats: pkmn.stats,
         });
       }
 
@@ -165,6 +184,7 @@ function MyForm({ setTableData }) {
         name: jsonData.name,
         types: jsonData.types,
         sprite: jsonData.sprites.front_default,
+        stats: jsonData.stats,
       });
     }
   }
@@ -211,3 +231,10 @@ function App() {
 export default App;
 
 // TODO: add a default paramater for the search
+// TODO: add a placeholder if no sprite
+// TODO: Add types
+// TODO: Add router
+// TODO: Refacto variable names
+// TODO: filter longer names
+// TODO: add a page for the forms clickable
+//TODO: modal if no search by ?

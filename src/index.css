@@ -209,3 +209,31 @@ body,
 .center-box button:hover {
   background-color: #2563eb;
 }
+
+.pokemon-stats {
+  font-family: monospace; /* Monospace for equal-width characters */
+  white-space: nowrap; /* Prevent line breaks */
+}
+
+.stat-row,
+.value-row {
+  display: flex;
+  justify-content: space-between; /* Distribute items evenly */
+  gap: 12px; /* Adjust gap to match your screenshot */
+  padding: 2px 0;
+}
+
+.stat-row span,
+.value-row span {
+  min-width: 32px; /* Ensure equal spacing */
+  text-align: center;
+}
+
+.test:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+.test2 {
+  font-family: monospace; /* Monospace for equal-width characters */
+  white-space: nowrap; /* Prevent line breaks */
+}

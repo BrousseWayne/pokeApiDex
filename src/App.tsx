@@ -325,7 +325,7 @@ export function Search() {
   );
 }
 
-export function Search() {
+export function Moves() {
   const [tableData, setTableData] = useState([]);
 
   return (
@@ -349,3 +349,5 @@ export default Layout;
 // TODO: add a page for the forms clickable
 //TODO: modal if no search by ?
 //TODO: animation while fetching
+//TODO: add details for moves and individual poke
+//TODO: refacto the search ?

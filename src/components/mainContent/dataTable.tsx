@@ -1,7 +1,7 @@
 import { capitalizeFirstLetter } from "@/lib/utils";
-import { Table, TableBody, TableCell, TableRow } from "./ui/table";
-import { TypeButton } from "./typeButton";
-import { StatsArray } from "./statsArray";
+import { Table, TableBody, TableCell, TableRow } from "../ui/table";
+import { TypeButton } from "../ui/typeButton";
+import { StatsArray } from "../ui/statsArray";
 
 function TableElement({ pokemon }) {
   return (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TableDemo } from "./components/dataTable";
+import { TableDemo } from "./components/mainContent/dataTable";
 
 export function Moves() {
   const [tableData, setTableData] = useState([]);

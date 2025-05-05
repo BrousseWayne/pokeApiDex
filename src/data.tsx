@@ -1,5 +1,5 @@
 import { Disc2 } from "lucide-react";
-import { CustomIcon } from "./components/customIcon";
+import { CustomIcon } from "./components/ui/customIcon";
 
 export const sideBarData = [
   {

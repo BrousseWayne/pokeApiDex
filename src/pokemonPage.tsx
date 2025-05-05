@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MyForm } from "./components/mainContent/searchForm";
-import { TableDemo } from "./components/dataTable";
+import { TableDemo } from "./components/mainContent/dataTable";
 
 export function Search() {
   const [tableData, setTableData] = useState([]);

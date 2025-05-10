@@ -36,7 +36,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-// should spread in trh ebox
+//TODO: should spread in the box
 
 const POKEMON_TYPES = [
   { value: "normal", label: "Normal" },

@@ -192,7 +192,7 @@ export function OperatorSelect({ value, onChange }: OperatorSelectProps) {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="p-1">
-          <DropdownMenuItem onClick={() => onChange("")}>
+          <DropdownMenuItem onClick={() => onChange("=")}>
             <Label className="text-muted-foreground">None</Label>
           </DropdownMenuItem>
 
@@ -275,7 +275,7 @@ function ActiveFilterBadge({
   );
 }
 
-export function MoveSearchFilters() {
+export function MoveSearchFilters({ setTableData }) {
   const [isOpen, setIsOpen] = useState(true);
   const [moveName, setMoveName] = useState("");
   const [powerOperator, setPowerOperator] = useState<Operator>("=");
@@ -291,8 +291,7 @@ export function MoveSearchFilters() {
     e.preventDefault();
     const query = {
       moveName,
-      powerOperator,
-      movePower,
+      moveStats: { movePower, powerOperator },
       moveType,
       damageClass,
     };
@@ -307,7 +306,29 @@ export function MoveSearchFilters() {
       body: JSON.stringify(query),
     });
 
-    console.log(response);
+    const moveDataJson = await response.json();
+    console.log(moveDataJson);
+
+    if (Array.isArray(moveDataJson)) {
+      const ret = [];
+      for (const move of moveDataJson) {
+        ret.push({
+          name: move.name,
+          type: move.type.name,
+          damageClass: move.damage_class.name,
+          power: move.power,
+        });
+      }
+
+      setTableData(ret);
+    } else {
+      setTableData({
+        name: moveDataJson.name,
+        type: moveDataJson.type.name,
+        damageClass: moveDataJson.damage_class.name,
+        power: moveDataJson.power,
+      });
+    }
   }
 
   return (

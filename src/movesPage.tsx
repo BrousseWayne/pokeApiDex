@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { TableDemo } from "./components/mainContent/dataTable";
 import { MoveSearchFilters } from "./components/mainContent/searchForm";
+import { TableDemo2 } from "./components/mainContent/dataTable copy";
 
 export function Moves() {
   const [tableData, setTableData] = useState([]);
@@ -8,10 +8,9 @@ export function Moves() {
   return (
     <>
       <div className="center-box">
-        {/* <MyForm setTableData={setTableData} /> */}
-        <MoveSearchFilters />
+        <MoveSearchFilters setTableData={setTableData} />
       </div>
-      <div>{<TableDemo tableData={tableData} />}</div>
+      <div>{<TableDemo2 tableData={tableData} />}</div>
     </>
   );
 }

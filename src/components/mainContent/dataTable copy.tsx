@@ -6,8 +6,16 @@ import { GenericTooltip } from "./searchForm";
 import { Label } from "../ui/label";
 
 function MoveTableElement({ move }) {
-  const moveName = capitalizeFirstLetter(move.name);
+  const doubleDashIndex = move.name.search("--");
+  let moveName: string = move.name;
   const tooltipText = move.short_desc?.[0]?.short_effect;
+
+  if (doubleDashIndex !== -1) {
+    moveName = moveName.slice(0, doubleDashIndex);
+  }
+
+  moveName = moveName.replaceAll("-", " ");
+  moveName = capitalizeFirstLetter(moveName);
 
   return (
     <>

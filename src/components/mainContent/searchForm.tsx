@@ -292,8 +292,8 @@ function ActiveFilterBadge({
     </div>
   );
 }
-
 export function MoveSearchFilters({ setTableData }) {
+  // State management
   const [isOpen, setIsOpen] = useState(true);
   const [filters, setFilters] = useState({
     moveName: "",
@@ -303,56 +303,64 @@ export function MoveSearchFilters({ setTableData }) {
     damageClass: "" as DamageClass,
   });
 
+  // Handlers
   const toggleOpen = () => setIsOpen(!isOpen);
 
-  const hasActiveFilters = moveName || movePower || moveType || damageClass;
+  const handleFilterChange = (field: keyof typeof filters, value: any) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const query = {
-      moveName,
-      moveStats: { movePower, powerOperator },
-      moveType,
-      damageClass,
-    };
-
-    const response = await fetch(`http://localhost:3000/moves`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify(query),
+  const resetFilters = () => {
+    setFilters({
+      moveName: "",
+      powerOperator: "=",
+      movePower: "",
+      moveType: "",
+      damageClass: "",
     });
+  };
 
-    const moveDataJson = await response.json();
+  const formatMoveData = (move: any) => ({
+    name: move.name,
+    type: move.type.name,
+    damageClass: move.damage_class.name,
+    power: move.power,
+    pp: move.pp,
+    accuracy: move.accuracy,
+    short_desc: move.effect_entries,
+  });
 
-    if (Array.isArray(moveDataJson)) {
-      const ret = [];
-      for (const move of moveDataJson) {
-        ret.push({
-          name: move.name,
-          type: move.type.name,
-          damageClass: move.damage_class.name,
-          power: move.power,
-          pp: move.pp,
-          accuracy: move.accuracy,
-          short_desc: move.effect_entries,
-        });
-      }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-      setTableData(ret);
-    } else {
-      setTableData({
-        name: moveDataJson.name,
-        type: moveDataJson.type.name,
-        damageClass: moveDataJson.damage_class.name,
-        power: moveDataJson.power,
-        pp: moveDataJson.pp,
-        accuracy: moveDataJson.accuracy,
-        short_desc: moveDataJson.effect_entries[0].short_effect,
+    try {
+      const response = await fetch(`http://localhost:3000/moves`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          moveName: filters.moveName,
+          moveStats: {
+            movePower: filters.movePower,
+            powerOperator: filters.powerOperator,
+          },
+          moveType: filters.moveType,
+          damageClass: filters.damageClass,
+        }),
       });
+
+      const data = await response.json();
+      setTableData(
+        Array.isArray(data) ? data.map(formatMoveData) : formatMoveData(data)
+      );
+    } catch (error) {
+      console.error("Fetch error:", error);
     }
-  }
+  };
+
+  // Derived state
+  const hasActiveFilters = Object.values(filters).some(
+    (val) => val !== "" && val !== "="
+  );
 
   return (
     <div className="border rounded p-4 w-full">
@@ -368,15 +376,11 @@ export function MoveSearchFilters({ setTableData }) {
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="md:col-span-2 space-y-1">
-              <Label className="text-sm font-medium" htmlFor="move-name">
-                Move Name
-              </Label>
+              <Label className="text-sm font-medium">Move Name</Label>
               <Input
-                id="move-name"
-                type="text"
+                value={filters.moveName}
+                onChange={(e) => handleFilterChange("moveName", e.target.value)}
                 placeholder="Enter a move name"
-                value={moveName}
-                onChange={(e) => setMoveName(e.target.value)}
                 className="w-full h-10"
               />
             </div>
@@ -385,14 +389,16 @@ export function MoveSearchFilters({ setTableData }) {
               <Label className="text-sm font-medium">Move Power</Label>
               <div className="flex gap-2 items-center">
                 <OperatorSelect
-                  value={powerOperator}
-                  onChange={setPowerOperator}
+                  value={filters.powerOperator}
+                  onChange={(op) => handleFilterChange("powerOperator", op)}
                 />
                 <Input
                   type="number"
+                  value={filters.movePower}
+                  onChange={(e) =>
+                    handleFilterChange("movePower", e.target.value)
+                  }
                   placeholder="Power"
-                  value={movePower}
-                  onChange={(e) => setMovePower(e.target.value)}
                   className="w-full h-10"
                 />
               </div>
@@ -400,48 +406,51 @@ export function MoveSearchFilters({ setTableData }) {
 
             <div className="space-y-1">
               <Label className="text-sm font-medium">Type</Label>
-              <TypeFilter value={moveType} onChange={setMoveType} />
+              <TypeFilter
+                value={filters.moveType}
+                onChange={(type) => handleFilterChange("moveType", type)}
+              />
             </div>
 
             <div className="space-y-1">
               <Label className="text-sm font-medium">Damage Class</Label>
               <DamageClassSelect
-                value={damageClass}
-                onChange={setDamageClass}
+                value={filters.damageClass}
+                onChange={(dc) => handleFilterChange("damageClass", dc)}
               />
             </div>
           </div>
 
           {hasActiveFilters && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {moveName && (
+              {filters.moveName && (
                 <ActiveFilterBadge
-                  content={`Move: ${moveName}`}
-                  onChange={() => setMoveName("")}
+                  content={`Move: ${filters.moveName}`}
+                  onChange={() => handleFilterChange("moveName", "")}
                   variant="move"
                 />
               )}
-              {movePower && (
+              {filters.movePower && (
                 <ActiveFilterBadge
-                  content={`Power: ${powerOperator} ${movePower}`}
+                  content={`Power: ${filters.powerOperator} ${filters.movePower}`}
                   onChange={() => {
-                    setMovePower("");
-                    setPowerOperator("=");
+                    handleFilterChange("movePower", "");
+                    handleFilterChange("powerOperator", "=");
                   }}
                   variant="power"
                 />
               )}
-              {moveType && (
+              {filters.moveType && (
                 <ActiveFilterBadge
-                  content={`Type: ${moveType}`}
-                  onChange={() => setMoveType("")}
+                  content={`Type: ${filters.moveType}`}
+                  onChange={() => handleFilterChange("moveType", "")}
                   variant="type"
                 />
               )}
-              {damageClass && (
+              {filters.damageClass && (
                 <ActiveFilterBadge
-                  content={`Damage Class: ${damageClass}`}
-                  onChange={() => setDamageClass("")}
+                  content={`Damage Class: ${filters.damageClass}`}
+                  onChange={() => handleFilterChange("damageClass", "")}
                   variant="damage"
                 />
               )}
@@ -452,22 +461,15 @@ export function MoveSearchFilters({ setTableData }) {
             <Button
               type="button"
               variant="secondary"
-              className=" hover:bg-red-500 hover:text-white transition-colors"
-              onClick={() => {
-                setMoveName("");
-                setMovePower("");
-                setPowerOperator("=");
-                setMoveType("");
-                setDamageClass("");
-              }}
+              className="hover:bg-red-500 hover:text-white transition-colors"
+              onClick={resetFilters}
             >
               Reset Filters
             </Button>
-
             <Button
               type="submit"
               variant="secondary"
-              className=" hover:bg-green-600 hover:text-white transition-colors"
+              className="hover:bg-green-600 hover:text-white transition-colors"
             >
               Query
             </Button>

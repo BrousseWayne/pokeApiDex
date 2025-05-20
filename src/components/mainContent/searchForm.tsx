@@ -236,14 +236,32 @@ export function DamageClassSelect({ value, onChange }: DamageClassSelectProps) {
 
           <DropdownMenuItem onClick={() => onChange("Status")}>
             <Label>Status</Label>
+            <Check
+              className={cn(
+                "ml-auto",
+                value === "Status" ? "opacity-100" : "opacity-0"
+              )}
+            />
           </DropdownMenuItem>
 
           <DropdownMenuItem onClick={() => onChange("Physical")}>
             <Label>Physical</Label>
+            <Check
+              className={cn(
+                "ml-auto",
+                value === "Physical" ? "opacity-100" : "opacity-0"
+              )}
+            />
           </DropdownMenuItem>
 
           <DropdownMenuItem onClick={() => onChange("Special")}>
             <Label>Special</Label>
+            <Check
+              className={cn(
+                "ml-auto",
+                value === "Special" ? "opacity-100" : "opacity-0"
+              )}
+            />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -277,15 +295,17 @@ function ActiveFilterBadge({
 
 export function MoveSearchFilters({ setTableData }) {
   const [isOpen, setIsOpen] = useState(true);
-  const [moveName, setMoveName] = useState("");
-  const [powerOperator, setPowerOperator] = useState<Operator>("=");
-  const [damageClass, setDamageClass] = useState<DamageClass>("");
-  const [movePower, setMovePower] = useState("");
-  const [moveType, setMoveType] = useState("");
+  const [filters, setFilters] = useState({
+    moveName: "",
+    powerOperator: "=" as Operator,
+    movePower: "",
+    moveType: "",
+    damageClass: "" as DamageClass,
+  });
 
-  function toggleOpen() {
-    setIsOpen(!isOpen);
-  }
+  const toggleOpen = () => setIsOpen(!isOpen);
+
+  const hasActiveFilters = moveName || movePower || moveType || damageClass;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -296,8 +316,6 @@ export function MoveSearchFilters({ setTableData }) {
       damageClass,
     };
 
-    console.log(JSON.stringify(query));
-
     const response = await fetch(`http://localhost:3000/moves`, {
       headers: {
         "Content-Type": "application/json",
@@ -307,7 +325,6 @@ export function MoveSearchFilters({ setTableData }) {
     });
 
     const moveDataJson = await response.json();
-    console.log(moveDataJson);
 
     if (Array.isArray(moveDataJson)) {
       const ret = [];
@@ -317,6 +334,9 @@ export function MoveSearchFilters({ setTableData }) {
           type: move.type.name,
           damageClass: move.damage_class.name,
           power: move.power,
+          pp: move.pp,
+          accuracy: move.accuracy,
+          short_desc: move.effect_entries,
         });
       }
 
@@ -327,38 +347,43 @@ export function MoveSearchFilters({ setTableData }) {
         type: moveDataJson.type.name,
         damageClass: moveDataJson.damage_class.name,
         power: moveDataJson.power,
+        pp: moveDataJson.pp,
+        accuracy: moveDataJson.accuracy,
+        short_desc: moveDataJson.effect_entries[0].short_effect,
       });
     }
   }
 
   return (
-    <div className="border rounded p-4 space-y-2">
+    <div className="border rounded p-4 w-full">
       <div
-        className="flex items-center justify-between cursor-pointer"
+        className="flex items-center justify-between cursor-pointer mb-2"
         onClick={toggleOpen}
       >
         <h2 className="text-lg font-semibold">Move Search Filters</h2>
         {isOpen ? <ChevronDown /> : <ChevronRight />}
       </div>
-      <div
-        className={`transition-all duration-50 overflow-hidden ${
-          isOpen ? "max-h-[1000px]" : "max-h-0"
-        }`}
-      >
-        {isOpen && (
-          <form className="flex flex-col" onSubmit={handleSubmit}>
-            <div className="grid items-center gap-2">
-              <Label htmlFor="move-name">Move Name</Label>
+
+      {isOpen && (
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="md:col-span-2 space-y-1">
+              <Label className="text-sm font-medium" htmlFor="move-name">
+                Move Name
+              </Label>
               <Input
                 id="move-name"
                 type="text"
                 placeholder="Enter a move name"
                 value={moveName}
                 onChange={(e) => setMoveName(e.target.value)}
+                className="w-full h-10"
               />
+            </div>
 
-              <Label>Move Power</Label>
-              <div className="flex gap-2">
+            <div className="space-y-1">
+              <Label className="text-sm font-medium">Move Power</Label>
+              <div className="flex gap-2 items-center">
                 <OperatorSelect
                   value={powerOperator}
                   onChange={setPowerOperator}
@@ -368,84 +393,87 @@ export function MoveSearchFilters({ setTableData }) {
                   placeholder="Power"
                   value={movePower}
                   onChange={(e) => setMovePower(e.target.value)}
-                  className="w-24"
+                  className="w-full h-10"
                 />
               </div>
+            </div>
 
-              <Label>Type</Label>
+            <div className="space-y-1">
+              <Label className="text-sm font-medium">Type</Label>
               <TypeFilter value={moveType} onChange={setMoveType} />
+            </div>
 
-              <Label>Damage class</Label>
+            <div className="space-y-1">
+              <Label className="text-sm font-medium">Damage Class</Label>
               <DamageClassSelect
                 value={damageClass}
                 onChange={setDamageClass}
               />
             </div>
+          </div>
 
-            {(moveName || movePower || moveType || damageClass) && (
-              <div className="flex flex-wrap gap-2">
-                {moveName && (
-                  <ActiveFilterBadge
-                    content={`Move: ${moveName}`}
-                    onChange={() => setMoveName("")}
-                    variant="move"
-                  />
-                )}
-                {movePower && (
-                  <ActiveFilterBadge
-                    content={`Power: ${powerOperator} ${movePower}`}
-                    onChange={() => {
-                      setMovePower("");
-                      setPowerOperator("=");
-                    }}
-                    variant="power"
-                  />
-                )}
-                {moveType && (
-                  <ActiveFilterBadge
-                    content={`Type: ${moveType}`}
-                    onChange={() => setMoveType("")}
-                    variant="type"
-                  />
-                )}
-                {damageClass && (
-                  <ActiveFilterBadge
-                    content={`Damage Class: ${damageClass}`}
-                    onChange={() => setDamageClass("")}
-                    variant="damage"
-                  />
-                )}
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex justify-between gap-2 mt-4">
-              <Button
-                type="button"
-                variant="secondary"
-                className="hover:bg-red-500 hover:text-white transition-colors transform active:scale-95"
-                onClick={() => {
-                  setMoveName("");
-                  setMovePower("");
-                  setPowerOperator("=");
-                  setMoveType("");
-                  setDamageClass("");
-                }}
-              >
-                Reset Filters
-              </Button>
-
-              <Button
-                type="submit"
-                variant="secondary"
-                className="hover:bg-green-600 transition-colors transform active:scale-95"
-              >
-                Query
-              </Button>
+          {hasActiveFilters && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {moveName && (
+                <ActiveFilterBadge
+                  content={`Move: ${moveName}`}
+                  onChange={() => setMoveName("")}
+                  variant="move"
+                />
+              )}
+              {movePower && (
+                <ActiveFilterBadge
+                  content={`Power: ${powerOperator} ${movePower}`}
+                  onChange={() => {
+                    setMovePower("");
+                    setPowerOperator("=");
+                  }}
+                  variant="power"
+                />
+              )}
+              {moveType && (
+                <ActiveFilterBadge
+                  content={`Type: ${moveType}`}
+                  onChange={() => setMoveType("")}
+                  variant="type"
+                />
+              )}
+              {damageClass && (
+                <ActiveFilterBadge
+                  content={`Damage Class: ${damageClass}`}
+                  onChange={() => setDamageClass("")}
+                  variant="damage"
+                />
+              )}
             </div>
-          </form>
-        )}
-      </div>
+          )}
+
+          <div className="flex justify-center gap-4 mt-2">
+            <Button
+              type="button"
+              variant="secondary"
+              className=" hover:bg-red-500 hover:text-white transition-colors"
+              onClick={() => {
+                setMoveName("");
+                setMovePower("");
+                setPowerOperator("=");
+                setMoveType("");
+                setDamageClass("");
+              }}
+            >
+              Reset Filters
+            </Button>
+
+            <Button
+              type="submit"
+              variant="secondary"
+              className=" hover:bg-green-600 hover:text-white transition-colors"
+            >
+              Query
+            </Button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

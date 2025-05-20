@@ -169,8 +169,8 @@ body,
 
 /* Center square */
 .center-box {
-  width: 1200px;
-  height: 600px;
+  max-width: 1000px;
+  /* height: 600px; */
   border: 1px solid #333;
   border-radius: 8px;
   background-color: #111;
@@ -179,7 +179,7 @@ body,
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  margin-top: -200px;
+  /* margin-top: -200px; */
 }
 
 /* Form inside square */

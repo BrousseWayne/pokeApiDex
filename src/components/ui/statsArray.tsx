@@ -19,9 +19,9 @@ export function StatsArray({ stats }) {
   );
 }
 
-//care if the move has all those properties
-export function MoveStatsArray({ stats }) {
-  console.log(stats);
+export function MoveStatsArray({ move }) {
+  console.log(move.short_desc[0]);
+
   return (
     <div className="pokemon-stats">
       <div className="stat-row">
@@ -29,10 +29,11 @@ export function MoveStatsArray({ stats }) {
         <span>Accuracy</span>
         <span>PP</span>
       </div>
+
       <div className="value-row">
-        {<span>{stats.power}</span>}
-        <span>{stats.accuracy}</span>
-        <span>{stats.pp}</span>
+        <span>{move.power || "-"}</span>
+        <span>{move.accuracy || "-"}</span>
+        <span>{move.pp || "-"}</span>
       </div>
     </div>
   );

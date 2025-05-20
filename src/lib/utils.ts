@@ -6,5 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function capitalizeFirstLetter(val: string) {
-  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+  const words = val.split(" ");
+
+  return words
+    .map((str) => str.charAt(0).toUpperCase() + str.slice(1))
+    .join(" ");
 }

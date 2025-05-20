@@ -1,40 +1,40 @@
 import { capitalizeFirstLetter } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { TypeButton } from "../ui/typeButton";
-import { StatsArray } from "../ui/statsArray";
+import { MoveStatsArray, StatsArray } from "../ui/statsArray";
+import { GenericTooltip } from "./searchForm";
 
-function TableElement2({ move }) {
+function MoveTableElement({ move }) {
   return (
     <>
       <TableCell className="font-medium test2">
-        {/* <img
-          src={move.sprite}
-          alt={move.name}
-          className="w-15 h-15 object-contain"
-        /> */}
+        {/* <GenericTooltip text={move.effect_entries[0].short_effect}> */}
         {capitalizeFirstLetter(move.name)}
+        {/* </GenericTooltip> */}
       </TableCell>
       <TableCell>
         <div className="flex">
           <TypeButton key={move.name} type={move.type} />
         </div>
       </TableCell>
-      <TableCell>{/* <StatsArray stats={move.stats} /> */}</TableCell>
+      <TableCell>
+        <MoveStatsArray stats={move} />
+      </TableCell>
     </>
   );
 }
-export function TableDemo2({ tableData }) {
+export function MoveTableDemo({ tableData }) {
   return (
     <Table>
       <TableBody>
         {!Array.isArray(tableData) ? (
           <TableRow className="test">
-            <TableElement2 move={tableData} />
+            <MoveTableElement move={tableData} />
           </TableRow>
         ) : (
-          tableData.map((pokemon) => (
-            <TableRow key={pokemon.name}>
-              <TableElement2 move={pokemon} />
+          tableData.map((move) => (
+            <TableRow key={move.name}>
+              <MoveTableElement move={move} />
             </TableRow>
           ))
         )}

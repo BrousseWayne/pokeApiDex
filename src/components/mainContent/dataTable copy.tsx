@@ -3,14 +3,22 @@ import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { TypeButton } from "../ui/typeButton";
 import { MoveStatsArray, StatsArray } from "../ui/statsArray";
 import { GenericTooltip } from "./searchForm";
+import { Label } from "../ui/label";
 
 function MoveTableElement({ move }) {
+  const moveName = capitalizeFirstLetter(move.name);
+  const tooltipText = move.short_desc?.[0]?.short_effect;
+
   return (
     <>
       <TableCell className="font-medium test2">
-        {/* <GenericTooltip text={move.effect_entries[0].short_effect}> */}
-        {capitalizeFirstLetter(move.name)}
-        {/* </GenericTooltip> */}
+        {tooltipText ? (
+          <GenericTooltip text={tooltipText}>
+            <Label>{moveName}</Label>
+          </GenericTooltip>
+        ) : (
+          moveName
+        )}
       </TableCell>
       <TableCell>
         <div className="flex">
@@ -18,11 +26,12 @@ function MoveTableElement({ move }) {
         </div>
       </TableCell>
       <TableCell>
-        <MoveStatsArray stats={move} />
+        <MoveStatsArray move={move} />
       </TableCell>
     </>
   );
 }
+
 export function MoveTableDemo({ tableData }) {
   return (
     <Table>

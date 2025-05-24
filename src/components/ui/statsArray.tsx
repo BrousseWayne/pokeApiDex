@@ -20,8 +20,6 @@ export function StatsArray({ stats }) {
 }
 
 export function MoveStatsArray({ move }) {
-  console.log(move.short_desc[0]);
-
   return (
     <div className="pokemon-stats">
       <div className="stat-row">

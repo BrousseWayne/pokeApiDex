@@ -4,6 +4,7 @@ import { TypeButton } from "../ui/typeButton";
 import { MoveStatsArray, StatsArray } from "../ui/statsArray";
 import { GenericTooltip } from "./searchForm";
 import { Label } from "../ui/label";
+import { Link } from "react-router";
 
 function MoveTableElement({ move }) {
   const doubleDashIndex = move.name.search("--");
@@ -22,10 +23,20 @@ function MoveTableElement({ move }) {
       <TableCell className="font-medium test2">
         {tooltipText ? (
           <GenericTooltip text={tooltipText}>
-            <Label>{moveName}</Label>
+            <Link
+              to={`/moves/${move.name}`}
+              className="text-blue-500 hover:underline"
+            >
+              <Label>{moveName}</Label>
+            </Link>
           </GenericTooltip>
         ) : (
-          moveName
+          <Link
+            to={`/moves/${move.name}`}
+            className="text-blue-500 hover:underline"
+          >
+            {moveName}
+          </Link>
         )}
       </TableCell>
       <TableCell>

@@ -181,6 +181,8 @@ export function GenericTooltip({ text, children }: GenericTooltipProps) {
   );
 }
 
+// TODO: map over config object for generic composants
+
 export function OperatorSelect({ value, onChange }: OperatorSelectProps) {
   return (
     <div className="flex gap-2">
@@ -292,6 +294,10 @@ function ActiveFilterBadge({
     </div>
   );
 }
+
+//create useSearchFilters
+//remove fetch
+//only set filters
 export function MoveSearchFilters({ setTableData }) {
   // State management
   const [isOpen, setIsOpen] = useState(true);
@@ -357,6 +363,7 @@ export function MoveSearchFilters({ setTableData }) {
     }
   };
 
+  // maybe implement cache maison
   // Derived state
   const hasActiveFilters = Object.values(filters).some(
     (val) => val !== "" && val !== "="
@@ -496,7 +503,6 @@ export function MyForm({ setTableData }) {
     );
 
     const jsonData = await reponse.json();
-    console.log(jsonData);
     if (Array.isArray(jsonData)) {
       const ret = [];
       for (const pkmn of jsonData) {

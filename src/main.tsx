@@ -6,6 +6,14 @@ import { Search } from "./pokemonPage";
 import { Moves } from "./movesPage";
 import "./index.css";
 
+function TestRoute() {
+  return (
+    <>
+      <div style={{ background: "red" }}>TEST</div>
+    </>
+  );
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
@@ -13,6 +21,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/" element={<Layout />}>
           <Route path="/search" element={<Search />} />
           <Route path="/moves" element={<Moves />} />
+          <Route path="/moves/:moveId" element={<TestRoute />} />
         </Route>
       </Routes>
     </BrowserRouter>

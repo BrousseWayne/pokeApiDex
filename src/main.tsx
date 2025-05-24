@@ -5,14 +5,7 @@ import { Layout } from "./components/layout/layout";
 import { Search } from "./pokemonPage";
 import { Moves } from "./movesPage";
 import "./index.css";
-
-function TestRoute() {
-  return (
-    <>
-      <div style={{ background: "red" }}>TEST</div>
-    </>
-  );
-}
+import { TestRoute } from "./components/mainContent/individualMovePage";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

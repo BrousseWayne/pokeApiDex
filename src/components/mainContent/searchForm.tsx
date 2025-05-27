@@ -36,6 +36,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import "./searchForm.css";
+
 //TODO: should spread in the box
 
 const POKEMON_TYPES = [
@@ -370,31 +372,28 @@ export function MoveSearchFilters({ setTableData }) {
   );
 
   return (
-    <div className="border rounded p-4 w-full">
-      <div
-        className="flex items-center justify-between cursor-pointer mb-2"
-        onClick={toggleOpen}
-      >
+    <div className="container-box">
+      <div className="flex-row-between" onClick={toggleOpen}>
         <h2 className="text-lg font-semibold">Move Search Filters</h2>
         {isOpen ? <ChevronDown /> : <ChevronRight />}
       </div>
 
       {isOpen && (
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="md:col-span-2 space-y-1">
+        <form className="vertical-stack" onSubmit={handleSubmit}>
+          <div className="responsive-grid">
+            <div className="full-span-stack">
               <Label className="text-sm font-medium">Move Name</Label>
               <Input
                 value={filters.moveName}
                 onChange={(e) => handleFilterChange("moveName", e.target.value)}
                 placeholder="Enter a move name"
-                className="w-full h-10"
+                className="full-width-fixed-height"
               />
             </div>
 
-            <div className="space-y-1">
+            <div className="vertical-gap-xs">
               <Label className="text-sm font-medium">Move Power</Label>
-              <div className="flex gap-2 items-center">
+              <div className="flex-row-gap">
                 <OperatorSelect
                   value={filters.powerOperator}
                   onChange={(op) => handleFilterChange("powerOperator", op)}
@@ -406,12 +405,12 @@ export function MoveSearchFilters({ setTableData }) {
                     handleFilterChange("movePower", e.target.value)
                   }
                   placeholder="Power"
-                  className="w-full h-10"
+                  className="full-width-height"
                 />
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="vertical-gap-xs">
               <Label className="text-sm font-medium">Type</Label>
               <TypeFilter
                 value={filters.moveType}
@@ -419,7 +418,7 @@ export function MoveSearchFilters({ setTableData }) {
               />
             </div>
 
-            <div className="space-y-1">
+            <div className="vertical-gap-xs">
               <Label className="text-sm font-medium">Damage Class</Label>
               <DamageClassSelect
                 value={filters.damageClass}
@@ -429,7 +428,7 @@ export function MoveSearchFilters({ setTableData }) {
           </div>
 
           {hasActiveFilters && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex-wrap-gap">
               {filters.moveName && (
                 <ActiveFilterBadge
                   content={`Move: ${filters.moveName}`}
@@ -464,7 +463,7 @@ export function MoveSearchFilters({ setTableData }) {
             </div>
           )}
 
-          <div className="flex justify-center gap-4 mt-2">
+          <div className="centered-flex-gap">
             <Button
               type="button"
               variant="secondary"

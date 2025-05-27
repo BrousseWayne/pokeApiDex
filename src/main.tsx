@@ -5,7 +5,7 @@ import { Layout } from "./components/layout/layout";
 import { Search } from "./pokemonPage";
 import { Moves } from "./movesPage";
 import "./index.css";
-import { TestRoute } from "./components/mainContent/individualMovePage";
+import { TestRoute } from "./components/mainContent/moveDetailsPage";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

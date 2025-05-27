@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import "../../index.css";
 
 export function TestRoute() {
   const [data, setData] = useState(null);
@@ -41,7 +42,6 @@ export function TestRoute() {
 
   console.log(data);
 
-  // Safely destructure with default values
   const {
     name = "N/A",
     accuracy = "N/A",
@@ -55,11 +55,14 @@ export function TestRoute() {
   } = data;
 
   return (
-    <div>
-      <h1 style={{ color: "red" }}>{name}</h1>
-      <div>PP: {pp}</div>
-      <div>Priority: {priority}</div>
-      <div>Power: {power}</div>
+    <div className="testFlex">
+      <h1 className="testFlex2">{name}</h1>
+      <ul className="moveDetails">
+        <li>PP: {pp}</li>
+        <li>Priority: {priority}</li>
+        <li>Power: {power}</li>
+        <li>Accuracy: {accuracy}</li>
+      </ul>
       {/* <div>Damage Class: {damage_class}</div> */}
       {/* <div>Learned by: {learned_by_pokemon.join(", ") || "No Pokémon"}</div>
       <div>
@@ -71,7 +74,6 @@ export function TestRoute() {
         </ul>
       </div> */}
       {/* <div>Generation: {generation}</div> */}
-      <div>Accuracy: {accuracy}</div>
     </div>
   );
 }

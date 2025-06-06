@@ -1,6 +1,61 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import "../../index.css";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { Separator } from "../ui/separator";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { capitalizeFirstLetter } from "@/lib/utils";
+import { TypeButton } from "../ui/typeButton";
+
+export function StatsCard({ stats }) {
+  const [isOpen, setIsOpen] = useState(true);
+  const {
+    name = "N/A",
+    accuracy = "N/A",
+    pp = "N/A",
+    priority = "N/A",
+    power = "N/A",
+    damage_class = [],
+  } = stats;
+
+  const toggleOpen = () => setIsOpen(!isOpen);
+
+  return (
+    <div className="statsBoxContainer">
+      <div className="flex-row-between" onClick={toggleOpen}>
+        <div>Stats</div>
+        {isOpen ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+      </div>
+
+      {isOpen && (
+        <div>
+          <div className="moveCard">
+            <div className="moveRow category">
+              <span className="label">Category</span>
+              <span className="value">
+                {capitalizeFirstLetter(damage_class.name)}
+              </span>
+            </div>
+
+            <div className="moveRow">
+              <span className="label">PP</span>
+              <span className="value">{pp}</span>
+            </div>
+            <div className="moveRow">
+              <span className="label">Power</span>
+              <span className="value">{power}</span>
+            </div>
+            <div className="moveRow">
+              <span className="label">Accuracy</span>
+              <span className="value">{accuracy}%</span>
+            </div>
+          </div>
+          <div className="statsDataRow"></div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function TestRoute() {
   const [data, setData] = useState(null);
@@ -48,32 +103,25 @@ export function TestRoute() {
     pp = "N/A",
     priority = "N/A",
     power = "N/A",
-    damage_class = "N/A",
+    damage_class = [],
+    type = [],
     learned_by_pokemon = [],
     effect_entries = [],
     generation = "N/A",
   } = data;
+  console.log(data.type.name);
 
   return (
-    <div className="testFlex">
-      <h1 className="testFlex2">{name}</h1>
-      <ul className="moveDetails">
-        <li>PP: {pp}</li>
-        <li>Priority: {priority}</li>
-        <li>Power: {power}</li>
-        <li>Accuracy: {accuracy}</li>
-      </ul>
-      {/* <div>Damage Class: {damage_class}</div> */}
-      {/* <div>Learned by: {learned_by_pokemon.join(", ") || "No Pokémon"}</div>
-      <div>
-        Effects:
-        <ul>
-          {effect_entries.map((entry, index) => (
-            <li key={index}>{entry.effect}</li>
-          ))}
-        </ul>
-      </div> */}
-      {/* <div>Generation: {generation}</div> */}
+    <div className="flex items-start justify-between">
+      <div className="nameTypeBox">
+        <div>{capitalizeFirstLetter(name)}</div>
+        <TypeButton key={name} type={type.name} />
+      </div>
+      <div className="center-box-stats">
+        <StatsCard
+          stats={{ name, accuracy, priority, power, pp, damage_class }}
+        />
+      </div>
     </div>
   );
 }
